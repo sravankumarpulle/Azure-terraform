@@ -1,0 +1,59 @@
+parameters:
+  - name: env
+    displayName: Environment
+    type: object
+    default: 
+      - QA
+      - PROD
+    values:
+      - QA
+      - PROD
+      
+  - name: tfe_command_apply
+    displayName: tfe_command_apply
+    type: string
+    values:
+      - plan
+      - apply
+      - destroy
+
+steps:
+
+- checkout: self
+# - task: TerraformInstaller@0
+#   displayName: 'install'
+#   inputs:
+#     terraformVersion: '0.14.9'
+
+- task: TerraformTaskV4@4
+  inputs:
+    provider: 'azurerm'
+    command: 'init'
+    workingDirectory: '$(System.DefaultWorkingDirectory)'
+    backendServiceArm: '$(service_connection)'
+    backendAzureRmResourceGroupName: '$(resource_group)'
+    backendAzureRmStorageAccountName: '$(storage_account)'
+    backendAzureRmContainerName: '$(container_name)'
+    backendAzureRmKey:  'servicebus_terraform.tfstate' #$(backendAzureRmKey) 
+
+- task: TerraformTaskV1@0
+  displayName: 'validate'
+  inputs:
+    provider: 'azurerm'
+    command: 'validate'
+
+- task: TerraformTaskV1@0
+  displayName: 'apply'
+  inputs:
+    provider: 'azurerm'
+    command: ${{parameters.tfe_command_apply}}
+                            
+    commandOptions: '-input=false -auto-approve -var-file="terraform_QA.tfvars"'
+    environmentServiceNameAzureRM: $(service_connection)
+    workingDirectory: '$(System.DefaultWorkingDirectory)'
+
+             
+
+             
+
+             

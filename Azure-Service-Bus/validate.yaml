@@ -1,0 +1,102 @@
+parameters:
+  - name: env
+    displayName: Environment
+    type: object
+    default: 
+      - QA
+      - PROD
+    values:
+      - QA
+      - PROD
+
+  - name: tfe_command
+    displayName: tfe_command
+    type: string
+    values:
+      - plan
+      - apply
+
+
+
+
+jobs :
+  -  job: Initialize_and_Validate
+     steps:
+        # - checkout: self
+        # - task: TerraformInstaller@0
+        #   displayName: 'install'
+        #   inputs:
+        #     terraformVersion: '0.14.9'
+        
+       -  task: TerraformTaskV4@4
+          inputs:
+            provider: 'azurerm'
+            command: 'init'
+            workingDirectory: '$(System.DefaultWorkingDirectory)'
+            backendServiceArm: '$(service_connection)'
+            backendAzureRmResourceGroupName: '$(resource_group)'
+            backendAzureRmStorageAccountName: '$(storage_account)'
+            backendAzureRmContainerName: '$(container_name)'
+            backendAzureRmKey: 'servicebus_terraform.tfstate'
+       - task: TerraformTaskV1@0
+         displayName: 'validate'
+         inputs:
+           provider: 'azurerm'
+           command: 'validate'
+
+
+       - task: TerraformTaskV1@0
+         displayName: 'plan'
+         inputs:
+           provider: 'azurerm'
+           command: ${{parameters.tfe_command}}
+           commandOptions: '-input=false -var-file="terraform_QA.tfvars" '
+           environmentServiceNameAzureRM: $(service_connection)
+           workingDirectory: '$(System.DefaultWorkingDirectory)'
+        
+       - task: CopyFiles@2
+         displayName: 'Copy Files'  
+         inputs:
+           SourceFolder: '$(System.DefaultWorkingDirectory)/'
+           Contents: |
+             **/*
+             !.git/**/*
+             !.terraform/**/*
+             !*.hcl
+           TargetFolder: '$(Build.ArtifactStagingDirectory)/'
+
+       - task: ArchiveFiles@2
+         displayName: 'Create Plan Artifact'
+         inputs:
+           rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/'
+           includeRootFolder: false
+           archiveType: 'tar'
+           tarCompression: 'gz'
+           archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).tgz'
+           replaceExistingArchive: true
+              
+
+       - task: PublishBuildArtifacts@1
+         displayName: Publish Plan artifact
+         inputs:
+           PathtoPublish: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).tgz'
+           ArtifactName: '$(Build.BuildId)-tfplan'
+           publishLocation: 'Container'
+
+
+
+
+  
+
+
+
+       
+                      
+       
+
+                      
+       
+
+
+
+  

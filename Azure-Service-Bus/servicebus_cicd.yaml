@@ -1,0 +1,84 @@
+
+pool: 'Adani-IC-Dev-SelfHostedAgent'
+# pool:
+#   vmImage: ubuntu-latest
+variables:
+- group: 'terraform_adani_qa_sb'
+
+
+parameters:
+  - name: env
+    displayName: Environment
+    type: object
+    default: 
+      - QA
+      - PROD
+    values:
+      - QA
+      - PROD
+
+  - name: tfe_command
+    displayName: tfe_command
+    type: string
+    values:
+      - plan
+      - apply
+  - name: tfe_command_apply
+    displayName: tfe_command_apply
+    type: string
+    values:
+      - plan
+      - apply
+      - destroy
+   
+
+stages:
+- ${{ each envObject in parameters.env }}:
+  - stage: ${{ envObject }}_validate
+    displayName: ${{ envObject }} validate
+    jobs: 
+        - template: ./validate.yaml
+          parameters:
+           tfe_command: ${{parameters.tfe_command}}
+
+  - stage: ${{ envObject }}_Manual_Approval
+    jobs:
+      - job: waitForValidation
+        displayName: ${{ envObject }}_Manual_Approval
+        pool: server
+        timeoutInMinutes: 4320 # job times out in 3 days
+        steps:
+        - task: ManualValidation@0
+          timeoutInMinutes: 1440 # task times out in 1 day
+          inputs:
+            notifyUsers: |
+              manasa.srinivas@pwc.com
+            
+            instructions: 'Please validate the pan and resume'
+            onTimeout: 'resume'
+
+
+  - stage: ${{ envObject }}_apply
+    displayName: ${{ envObject }} apply
+    jobs:
+      - job: ${{ envObject }}_apply
+        steps:
+          - template: ./apply.yaml   
+            parameters:
+             tfe_command_apply:  ${{parameters.tfe_command_apply}}      
+
+  - stage: ${{ envObject }}_Sign_Off
+    jobs:
+      - job: waitForValidation
+        displayName: ${{ envObject }}_Sign_Off
+        pool: server
+        timeoutInMinutes: 4320 # job times out in 3 days
+        steps:
+        - task: ManualValidation@0
+          timeoutInMinutes: 1440 # task times out in 1 day
+          inputs:
+            notifyUsers: |
+              test@test.com
+              example@example.com
+            instructions: 'Please validate the build configuration and resume'
+            onTimeout: 'resume'

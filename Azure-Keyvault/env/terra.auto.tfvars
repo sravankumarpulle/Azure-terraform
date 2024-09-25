@@ -1,0 +1,7 @@
+subscription_id         = "##subscription_id##"
+resource_group_name     = "##resource_group_name##"
+location                = "##resource_group_location##"
+vnet_name               = "##vnet_name##"
+vnet_rg_name            = "##vnet_rg_name##"
+pe_subnet_name          = "##pe_subnet_name##"
+key_vault_name          = "##key_vault_name##"

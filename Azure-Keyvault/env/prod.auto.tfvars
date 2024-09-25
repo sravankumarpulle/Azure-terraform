@@ -1,0 +1,7 @@
+resource_group_name = "IC-Common-Prod-RG"
+location = "Central India"
+vnet_name       = "IC-Common-Prod-VNET"
+vnet_rg_name    = "IC-Common-Prod-RG"
+pe_subnet_name  = "IC-Common-Prod-VNET-PE-SNET-01"
+key_vault_name = "AZ01AKVPROD01" 
+subscription_id = "f33ad4d2-0349-41ba-8225-c808491d4610"

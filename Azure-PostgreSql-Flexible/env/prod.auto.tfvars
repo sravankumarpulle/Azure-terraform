@@ -1,0 +1,33 @@
+resource_group_name = "IC-Common-Prod-RG"
+location = "Central India"
+vnet_name       = "IC-Common-Prod-VNET"
+vnet_rg_name    = "IC-Common-Prod-RG"
+pe_subnet_name  = "IC-Common-Prod-VNET-PE-SNET-01"
+// aks_subnet_name= "IC-Common-NonProd-VNET-QA-AKS-SNET-01"
+
+delegated_subnet_name = "IC-Common-Prod-VNET-FLXPSTGRDB-SNET-01"
+postgresql_name = "az01apfp01"
+key_vault = "AZ01AKVPROD01"
+sku_name = "GP_Standard_D8ads_v5"
+storage_mb = "32768"
+backup_retention_days = "7"
+psql_version = "14"
+administrator_login = "psqladmin"
+public_network_access_enabled = false
+geo_redundant_backup_enabled = true
+private_dns_zone_id          = "/subscriptions/c50a8fb7-0872-4df8-991a-e994f8cafe5c/resourceGroups/glz-management-rg/providers/Microsoft.Network/privateDnsZones/privatelink.postgres.database.azure.com"
+subscription_id = "f33ad4d2-0349-41ba-8225-c808491d4610"
+postgres_db_name = "adaniicPrConfig"
+monitor_action_group_name = "resource-email-alert"
+// postgres_high_availability_mode = "ZoneRedundant"
+// postgres_standby_availability_zone = 1
+tags = {
+    Application = "AdaniIC",
+    BU = "IC",
+    Classification = "Silver",
+    Criticality = "High",
+    Env = "PROD",
+    Owner = "Parin Shah",
+    Role = "Application",
+    IAC = "Terraform"
+}

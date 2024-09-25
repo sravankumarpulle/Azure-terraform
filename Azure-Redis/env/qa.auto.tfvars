@@ -1,0 +1,15 @@
+resource_group_name = "IC-Common-NonProd-RG"
+location = "Central India"
+vnet_name       = "IC-Common-NonProd-VNET"
+vnet_rg_name    = "IC-Common-NonProd-RG"
+pe_subnet_name  = "IC-Common-NonProd-VNET-QA-PE-SNET-01"
+aks_subnet_name= "IC-Common-NonProd-VNET-QA-AKS-SNET-01"
+redis_cache_name = "AZ01ARCQA01"   #  "AZ01RDCAPP01"
+subscription_id = "14ab3967-5405-4155-8149-cfe09d49cd37"
+capacity = 2
+family = "C"
+sku_name = "Standard"
+enable_non_ssl_port = false
+minimum_tls_version = "1.2"
+public_network_access_enabled = false
+monitor_action_group_name = "resource-email-alert"
